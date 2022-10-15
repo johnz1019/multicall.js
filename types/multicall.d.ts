@@ -1,6 +1,7 @@
 /// <reference types="node"/>
 
 declare module '@makerdao/multicall' {
+  import { Signer } from '@ethersproject/abstract-signer';
   import { BigNumber } from 'bignumber.js';
 
   export interface IConfig {
@@ -10,6 +11,7 @@ declare module '@makerdao/multicall' {
     interval: number;
     staleBlockRetryWait: number;
     errorRetryWait: number;
+    signer: Signer;
   }
 
   export interface IPostProcess {
@@ -19,6 +21,7 @@ declare module '@makerdao/multicall' {
   export interface ICall {
     target: string;
     call: string[];
+    type: any;
     returns: (string | IPostProcess)[][];
   }
 

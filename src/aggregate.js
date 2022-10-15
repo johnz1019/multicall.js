@@ -45,7 +45,7 @@ export default async function aggregate(calls, config) {
     return acc;
   }, {});
 
-  calls = calls.map(({ call, target, returns }) => {
+  calls = calls.map(({ call, target, type, returns }) => {
     if (!target) target = config.multicallAddress;
     const [method, ...argValues] = call;
     const [argTypesString, returnTypesString] = method
@@ -60,7 +60,7 @@ export default async function aggregate(calls, config) {
         `
     );
     const args = argValues.map((argValue, idx) => [argValue, argTypes[idx]]);
-    const returnTypes = !!returnTypesString ? returnTypesString.split(',') : [];
+    const returnTypes = !!type? type: !!returnTypesString ? returnTypesString.split(',') : [];
     return {
       method: method.match(FIRST_CLOSING_PARENTHESES)[0],
       args,

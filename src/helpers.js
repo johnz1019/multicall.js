@@ -27,6 +27,10 @@ export function decodeParameter(type, val) {
 }
 
 export function decodeParameters(types, vals) {
+  if(types.length >= 1 && typeof types[0] !== 'string'){
+    const ret = defaultAbiCoder.decode(types[0], '0x' + vals.replace(/0x/i, ''));
+    return [ret];
+  }
   return defaultAbiCoder.decode(types, '0x' + vals.replace(/0x/i, ''));
 }
 
@@ -57,7 +61,7 @@ export function isEmpty(obj) {
   return !obj || Object.keys(obj).length === 0;
 }
 
-export async function ethCall(rawData, { id, web3, rpcUrl, block, multicallAddress, ws, wsResponseTimeout }) {
+export async function ethCall(rawData, { id, web3, signer, rpcUrl, block, multicallAddress, ws, wsResponseTimeout }) {
   const abiEncodedData = AGGREGATE_SELECTOR + strip0x(rawData);
   if (ws) {
     log('Sending via WebSocket');
@@ -98,7 +102,15 @@ export async function ethCall(rawData, { id, web3, rpcUrl, block, multicallAddre
       to: multicallAddress,
       data: abiEncodedData
     });
-  } else {
+  } 
+  else if (signer) {
+    log('Sending via ethers signer');
+    return signer.call({
+      to: multicallAddress,
+      data: abiEncodedData
+    });
+  }
+  else {
     log('Sending via XHR fetch');
     const rawResponse = await fetch(rpcUrl, {
       method: 'POST',
